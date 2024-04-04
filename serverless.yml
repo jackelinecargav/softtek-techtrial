@@ -1,0 +1,64 @@
+service: softtek-techtrial
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: 'us-east-1'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-1:058264078790:table/StarWars
+
+functions:
+  createJedi:
+    handler: src/functions/create.newJedi
+    events:
+      - httpApi:
+          path: /newJedi
+          method: post
+  getJedis:
+    handler: src/functions/get.getJedis
+    events:
+      - httpApi:
+          path: /getJedis
+          method: get
+  getResources:
+    handler: src/functions/getResources.getAdd
+    events:
+      - httpApi:
+          path: /getResources
+          method: get
+  getFilms:
+    handler: src/functions/getResources.getFilms
+    events:
+      - httpApi:
+          path: /getFilms
+          method: get
+  getTranslate:
+    handler: src/functions/getTranslate.getTranslate
+    timeout: 60
+    events:
+      - httpApi:
+          path: /getTranslate
+          method: get
+
+resources:
+  Resources:
+    StarWars:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: StarWars
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+plugins:
+  - serverless-auto-swagger
+  - serverless-offline
